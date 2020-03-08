@@ -2,46 +2,30 @@
 
 find_package(HPX)
 
-if(NOT HPX_FOUND)
-  if(NOT DEFINED BOOST_ROOT)
-    # deduce Boost location from environment (e.g. on woody.rrze.uni-erlangen.de)
-    set(BOOST_ENV_LIBDIR "$ENV{BOOST_LIBDIR}")
-    if(BOOST_ENV_LIBDIR)
-      set(Boost_NO_SYSTEM_PATHS true)
-      set(BOOST_ROOT "$ENV{BOOST_LIBDIR}/../")
-      set(Boost_LIBRARY_DIRS "$ENV{BOOST_LIBDIR}")
-      set(Boost_INCLUDE_DIR  "$ENV{BOOST_INCDIR}")
-    endif()
+if(NOT DEFINED BOOST_ROOT)
+  # deduce Boost location from environment (e.g. on woody.rrze.uni-erlangen.de)
+  set(BOOST_ENV_LIBDIR "$ENV{BOOST_LIBDIR}")
+  if(BOOST_ENV_LIBDIR)
+    set(Boost_NO_SYSTEM_PATHS true)
+    set(BOOST_ROOT "$ENV{BOOST_LIBDIR}/../")
+    set(Boost_LIBRARY_DIRS "$ENV{BOOST_LIBDIR}")
+    set(Boost_INCLUDE_DIR  "$ENV{BOOST_INCDIR}")
   endif()
-
-  # mandatory Boost libs go into the first line, optional ones into
-  # their own call. This avoids leaving out any available lib during
-  # link time. The reason for this ugly multi-stage discovery is the
-  # following: since CMAKE 2.8.11 each call to find_package(Boost...)
-  # will reset Boost_LIBRARIES.
-  find_package(Boost REQUIRED COMPONENTS date_time filesystem system)
-  set(ALL_BOOST_LIBS "${Boost_LIBRARIES}")
-  find_package(Boost COMPONENTS serialization)
-  set(ALL_BOOST_LIBS "${ALL_BOOST_LIBS};${Boost_LIBRARIES}")
-  find_package(Boost COMPONENTS thread)
-  set(ALL_BOOST_LIBS "${ALL_BOOST_LIBS};${Boost_LIBRARIES}")
-  find_package(Boost COMPONENTS move)
-  set(ALL_BOOST_LIBS "${ALL_BOOST_LIBS};${Boost_LIBRARIES}")
-else()
-  # If HPX was found, we use the Boost libraries found by HPX
-  set(ALL_BOOST_LIBS
-    ${HPX_BOOST_DATE_TIME_LIBRARY}
-    ${HPX_BOOST_FILESYSTEM_LIBRARY}
-    ${HPX_BOOST_SYSTEM_LIBRARY}
-    ${HPX_BOOST_SERIALIZATION_LIBRARY}
-    ${HPX_BOOST_THREAD_LIBRARY}
-  )
-  set(Boost_DATE_TIME_FOUND true)
-  set(Boost_FILESYSTEM_FOUND true)
-  set(Boost_SYSTEM_FOUND true)
-  set(Boost_SERIALIZATION_FOUND true)
-  set(Boost_THREAD_FOUND true)
 endif()
+
+# mandatory Boost libs go into the first line, optional ones into
+# their own call. This avoids leaving out any available lib during
+# link time. The reason for this ugly multi-stage discovery is the
+# following: since CMAKE 2.8.11 each call to find_package(Boost...)
+# will reset Boost_LIBRARIES.
+find_package(Boost REQUIRED COMPONENTS date_time filesystem system)
+set(ALL_BOOST_LIBS "${Boost_LIBRARIES}")
+find_package(Boost COMPONENTS serialization)
+set(ALL_BOOST_LIBS "${ALL_BOOST_LIBS};${Boost_LIBRARIES}")
+find_package(Boost COMPONENTS thread)
+set(ALL_BOOST_LIBS "${ALL_BOOST_LIBS};${Boost_LIBRARIES}")
+find_package(Boost COMPONENTS move)
+set(ALL_BOOST_LIBS "${ALL_BOOST_LIBS};${Boost_LIBRARIES}")
 
 find_package(Boost COMPONENTS mpi)
 set(Boost_MPI_LIBRARIES "${Boost_LIBRARIES}")
